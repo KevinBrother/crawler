@@ -1,0 +1,1881 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>爬取结果查询与管理</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background: white;
+            border-radius: 8px;
+            padding: 30px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #333;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .section {
+            margin-bottom: 30px;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            background-color: #fafafa;
+        }
+        .section h2 {
+            color: #555;
+            margin-top: 0;
+            margin-bottom: 15px;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+            color: #333;
+        }
+        input[type="text"], select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+            box-sizing: border-box;
+        }
+        button {
+            background-color: #007bff;
+            color: white;
+            padding: 12px 24px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            margin-right: 10px;
+            margin-bottom: 10px;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        button.secondary {
+            background-color: #6c757d;
+        }
+        button.secondary:hover {
+            background-color: #545b62;
+        }
+        .response {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 4px;
+            white-space: pre-wrap;
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        .success {
+            background-color: #d4edda;
+            border: 1px solid #c3e6cb;
+            color: #155724;
+        }
+        .error {
+            background-color: #f8d7da;
+            border: 1px solid #f5c6cb;
+            color: #721c24;
+        }
+        .file-list {
+            margin-top: 20px;
+        }
+        .file-item {
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            margin-bottom: 10px;
+            background-color: white;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .domain-group {
+            margin-bottom: 30px;
+            border: 2px solid #e9ecef;
+            border-radius: 12px;
+            padding: 20px;
+            background: #f8f9fa;
+        }
+        
+        .domain-header {
+            margin: 0 0 20px 0;
+            color: #495057;
+            font-size: 1.3em;
+            font-weight: 600;
+            border-bottom: 2px solid #dee2e6;
+            padding-bottom: 10px;
+        }
+        
+        .date-group {
+            margin-bottom: 25px;
+            border: 1px solid #dee2e6;
+            border-radius: 8px;
+            padding: 15px;
+            background: white;
+        }
+        
+        .date-header {
+            margin: 0 0 15px 0;
+            color: #6c757d;
+            font-size: 1.1em;
+            font-weight: 500;
+            border-bottom: 1px solid #e9ecef;
+            padding-bottom: 8px;
+        }
+        
+        .type-group {
+            margin-bottom: 20px;
+            padding: 10px;
+            border-left: 4px solid #007bff;
+            background: #f8f9fa;
+            border-radius: 0 6px 6px 0;
+        }
+        
+        .type-header {
+            margin: 0 0 10px 0;
+            color: #495057;
+            font-size: 1em;
+            font-weight: 500;
+        }
+        
+        .url-info {
+            color: #6c757d;
+            font-size: 0.9em;
+            margin-top: 5px;
+            font-style: italic;
+        }
+        .storage-path {
+            color: #0066cc;
+            font-size: 0.85em;
+            margin-top: 5px;
+            font-family: monospace;
+            background-color: #e7f3ff;
+            padding: 2px 6px;
+            border-radius: 3px;
+            word-break: break-all;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        
+        .storage-path:hover {
+            color: #004499;
+            background-color: #cce7ff;
+            text-decoration: underline;
+        }
+        .file-info {
+            flex: 1;
+        }
+        .file-name {
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 5px;
+        }
+        .file-meta {
+            font-size: 12px;
+            color: #666;
+        }
+        .file-actions {
+            margin-left: 15px;
+        }
+        .file-actions button {
+            padding: 6px 12px;
+            font-size: 12px;
+            margin: 0 2px;
+        }
+        .stats {
+            background-color: #e9ecef;
+            padding: 15px;
+            border-radius: 4px;
+            margin-bottom: 20px;
+        }
+        .stats h3 {
+            margin: 0 0 10px 0;
+            color: #495057;
+        }
+        .loading {
+            text-align: center;
+            color: #666;
+            font-style: italic;
+        }
+        .preview-modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.8);
+        }
+        .preview-content {
+            position: relative;
+            margin: 5% auto;
+            padding: 20px;
+            width: 80%;
+            max-width: 900px;
+            background-color: white;
+            border-radius: 8px;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+        .preview-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #ddd;
+        }
+        .preview-close {
+            background: #dc3545;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+        .preview-close:hover {
+            background: #c82333;
+        }
+        .preview-body {
+            text-align: center;
+        }
+        .preview-image {
+            max-width: 100%;
+            max-height: 60vh;
+            border-radius: 4px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .preview-video {
+            max-width: 100%;
+            max-height: 60vh;
+            border-radius: 4px;
+        }
+        .preview-audio {
+            width: 100%;
+            max-width: 500px;
+        }
+        .preview-document {
+            width: 100%;
+            height: 60vh;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        .preview-text {
+            text-align: left;
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 4px;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            white-space: pre-wrap;
+            max-height: 50vh;
+            overflow-y: auto;
+        }
+        .preview-unsupported {
+            padding: 40px;
+            text-align: center;
+            color: #666;
+        }
+        .file-type-icon {
+            margin-right: 8px;
+        }
+        .pagination {
+            text-align: center;
+            margin: 20px 0;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            border: 1px solid #dee2e6;
+        }
+        .pagination button {
+            margin: 0 2px;
+            padding: 8px 12px;
+            border: 1px solid #dee2e6;
+            background: white;
+            color: #495057;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.2s;
+        }
+        .pagination button:hover {
+            background: #e9ecef;
+            border-color: #adb5bd;
+        }
+        .pagination button:disabled {
+            background: #f8f9fa;
+            color: #6c757d;
+            cursor: not-allowed;
+            border-color: #dee2e6;
+        }
+        .pagination .current-page {
+            background: #007bff !important;
+            color: white !important;
+            font-weight: bold;
+            border-color: #007bff;
+        }
+        .pagination input {
+            width: 60px;
+            padding: 4px 8px;
+            margin: 0 5px;
+            border: 1px solid #ced4da;
+            border-radius: 4px;
+            text-align: center;
+        }
+        
+        /* 流式加载相关样式 */
+        .stream-loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #007bff;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-right: 10px;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .stream-stats {
+            background: linear-gradient(135deg, #e3f2fd 0%, #f8f9fa 100%);
+            border: 1px solid #bbdefb;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        
+        .stream-stats h3 {
+            margin: 0 0 15px 0;
+            color: #1976d2;
+            display: flex;
+            align-items: center;
+        }
+        
+        .stream-progress {
+            background: #e9ecef;
+            border-radius: 10px;
+            height: 8px;
+            margin: 10px 0;
+            overflow: hidden;
+        }
+        
+        .stream-progress-bar {
+            background: linear-gradient(90deg, #007bff, #0056b3);
+            height: 100%;
+            border-radius: 10px;
+            transition: width 0.3s ease;
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.7; }
+            100% { opacity: 1; }
+        }
+        
+        .file-item-new {
+            animation: slideInFromRight 0.5s ease-out;
+            border-left: 4px solid #28a745;
+        }
+        
+        @keyframes slideInFromRight {
+            from {
+                opacity: 0;
+                transform: translateX(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+        
+        .stream-controls {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            margin-top: 15px;
+        }
+        
+        .stream-status {
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 500;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+        }
+        
+        .stream-status.connecting {
+            background: #fff3cd;
+            color: #856404;
+            border: 1px solid #ffeaa7;
+        }
+        
+        .stream-status.loading {
+            background: #d1ecf1;
+            color: #0c5460;
+            border: 1px solid #bee5eb;
+        }
+        
+        .stream-status.completed {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        
+        .stream-status.error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        
+        /* 虚拟滚动相关样式 */
+        .stream-controls label {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            font-size: 14px;
+            cursor: pointer;
+            margin: 0;
+        }
+        
+        .stream-controls input[type="checkbox"] {
+            margin: 0;
+        }
+        
+        #streamFileContainer {
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            background: #fff;
+            position: relative;
+        }
+        
+        #streamFileContainer::-webkit-scrollbar {
+            width: 8px;
+        }
+        
+        #streamFileContainer::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 4px;
+        }
+        
+        #streamFileContainer::-webkit-scrollbar-thumb {
+            background: #c1c1c1;
+            border-radius: 4px;
+        }
+        
+        #streamFileContainer::-webkit-scrollbar-thumb:hover {
+            background: #a8a8a8;
+        }
+        
+        .virtual-scroll-indicator {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: rgba(0, 123, 255, 0.1);
+            color: #007bff;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: bold;
+            z-index: 10;
+        }
+        
+        #streamFileList {
+            transition: transform 0.1s ease-out;
+        }
+        
+        .file-item {
+            min-height: 120px;
+            box-sizing: border-box;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🗂️ 爬取结果查询与管理</h1>
+        
+        <!-- 文件查询部分 -->
+        <div class="section">
+            <h2>📁 文件查询</h2>
+            <div class="form-group">
+                <label for="queryType">查询类型:</label>
+                <select id="queryType" onchange="toggleQueryInputs()">
+                    <option value="all">查询所有文件</option>
+                    <option value="session">按会话ID查询</option>
+                    <option value="prefix">按前缀查询</option>
+                </select>
+            </div>
+            
+            <div class="form-group" id="sessionGroup" style="display: none;">
+                <label for="sessionId">会话ID:</label>
+                <input type="text" id="sessionId" placeholder="例如: me9mkkrv-h0hsi7">
+            </div>
+            
+            <div class="form-group" id="prefixGroup" style="display: none;">
+                <label for="prefix">文件前缀:</label>
+                <input type="text" id="prefix" placeholder="例如: domain/example.com/">
+            </div>
+            
+            <button onclick="listFiles()">🔍 查询文件</button>
+            <button onclick="clearResults()" class="secondary">🗑️ 清空结果</button>
+            
+            <div class="form-group" style="margin-top: 15px;">
+                <label for="pageSize">每页显示数量:</label>
+                <select id="pageSize">
+                    <option value="20">20</option>
+                    <option value="50" selected>50</option>
+                    <option value="100">100</option>
+                    <option value="200">200</option>
+                </select>
+            </div>
+            
+            <div class="form-group">
+                <label>
+                    <input type="checkbox" id="useStreamMode" checked onchange="toggleStreamMode()"> 
+                    启用流式加载模式 (适用于大量文件)
+                </label>
+                <small style="color: #666; display: block; margin-top: 5px;">
+                    流式模式可以更快地显示文件列表，特别适合处理大量文件时使用
+                </small>
+            </div>
+            
+            <div id="streamOptions" style="margin-top: 15px; padding: 15px; background: #f8f9fa; border-radius: 6px;">
+                <h4 style="margin: 0 0 10px 0; color: #495057;">🚀 流式加载选项</h4>
+                <div class="form-group">
+                    <label for="maxKeys">最大文件数量:</label>
+                    <select id="maxKeys">
+                        <option value="500" selected>500</option>
+                        <option value="1000">1000</option>
+                        <option value="2000">2000</option>
+                        <option value="5000">5000</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="batchSize">批次大小:</label>
+                    <select id="batchSize">
+                        <option value="10">10</option>
+                        <option value="20" selected>20</option>
+                        <option value="50">50</option>
+                        <option value="100">100</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 文件下载测试部分 -->
+        <div class="section">
+            <h2>⬇️ 文件下载测试</h2>
+            <div class="form-group">
+                <label for="fileName">文件名:</label>
+                <input type="text" id="fileName" placeholder="例如: domain/example.com/2025/08/13/pages/session-id/file.json">
+            </div>
+            <button onclick="getDownloadUrl()">🔗 生成下载链接</button>
+        </div>
+        
+        <!-- 会话管理部分 -->
+        <div class="section">
+            <h2>📋 会话管理</h2>
+            <button onclick="getActiveSessions()">📊 获取活跃会话</button>
+            <button onclick="getMediaStats()" class="secondary">📈 获取媒体统计</button>
+            
+            <div class="form-group" style="margin-top: 20px;">
+                <label for="sessionIdDetail">会话ID:</label>
+                <input type="text" id="sessionIdDetail" placeholder="输入会话ID查看详情">
+                <div style="margin-top: 10px;">
+                    <button onclick="getSessionStatus()">📄 查看会话状态</button>
+                    <button onclick="getSessionMedia()" class="secondary">🎬 查看会话媒体</button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 媒体搜索部分 -->
+        <div class="section">
+            <h2>🔍 媒体搜索</h2>
+            <div class="form-group">
+                <label for="searchQuery">搜索关键词:</label>
+                <input type="text" id="searchQuery" placeholder="输入文件名或URL关键词">
+            </div>
+            <div class="form-group">
+                <label for="searchSessionId">限定会话ID (可选):</label>
+                <input type="text" id="searchSessionId" placeholder="留空搜索所有会话">
+            </div>
+            <button onclick="searchMedia()">🔍 搜索媒体文件</button>
+        </div>
+        
+        <!-- 结果显示区域 -->
+        <div id="results"></div>
+    </div>
+
+    <!-- 预览模态框 -->
+    <div id="previewModal" class="preview-modal">
+        <div class="preview-content">
+            <div class="preview-header">
+                <h3 id="previewTitle">文件预览</h3>
+                <button class="preview-close" onclick="closePreview()">✕ 关闭</button>
+            </div>
+            <div class="preview-body" id="previewBody">
+                <!-- 预览内容将在这里动态加载 -->
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = 'http://localhost:3000/api/files';
+        
+        function toggleQueryInputs() {
+            const queryType = document.getElementById('queryType').value;
+            const sessionGroup = document.getElementById('sessionGroup');
+            const prefixGroup = document.getElementById('prefixGroup');
+            
+            sessionGroup.style.display = queryType === 'session' ? 'block' : 'none';
+            prefixGroup.style.display = queryType === 'prefix' ? 'block' : 'none';
+        }
+        
+        function toggleStreamMode() {
+            const useStreamMode = document.getElementById('useStreamMode').checked;
+            const streamOptions = document.getElementById('streamOptions');
+            streamOptions.style.display = useStreamMode ? 'block' : 'none';
+            isStreamMode = useStreamMode;
+        }
+        
+        let currentPage = 1;
+         let currentQueryParams = {};
+         let streamEventSource = null;
+         let streamedFiles = [];
+         let isStreamMode = true;
+         let virtualScrollEnabled = false;
+         let visibleStartIndex = 0;
+         let visibleEndIndex = 50;
+         let itemHeight = 120; // 估算的文件项高度
+         let containerHeight = 600; // 容器高度
+         let scrollThrottle = null;
+         let renderQueue = [];
+         let isRendering = false;
+        
+        async function listFiles(page = 1) {
+            // 关闭之前的流式连接
+            if (streamEventSource) {
+                streamEventSource.close();
+                streamEventSource = null;
+            }
+            
+            const queryType = document.getElementById('queryType').value;
+            const sessionId = document.getElementById('sessionId').value;
+            const prefix = document.getElementById('prefix').value;
+            const pageSize = document.getElementById('pageSize').value;
+            const useStreamMode = document.getElementById('useStreamMode').checked;
+            
+            // 保存当前查询参数用于分页
+            currentQueryParams = { queryType, sessionId, prefix, pageSize };
+            currentPage = page;
+            
+            if (useStreamMode) {
+                await listFilesStream();
+            } else {
+                await listFilesNormal(page);
+            }
+        }
+        
+        async function listFilesNormal(page = 1) {
+            const { queryType, sessionId, prefix, pageSize } = currentQueryParams;
+            
+            let url = `${API_BASE}`;
+            const params = new URLSearchParams();
+            
+            if (queryType === 'session' && sessionId) {
+                params.append('sessionId', sessionId);
+            } else if (queryType === 'prefix' && prefix) {
+                params.append('prefix', prefix);
+            }
+            
+            params.append('page', page.toString());
+            params.append('limit', pageSize);
+            
+            url += '?' + params.toString();
+            
+            showLoading(`正在查询第 ${page} 页文件...`);
+            
+            try {
+                const response = await fetch(url);
+                const data = await response.json();
+                
+                if (response.ok) {
+                    displayFileList(data);
+                } else {
+                    showError(`查询失败: ${data.message || '未知错误'}`);
+                }
+            } catch (error) {
+                showError(`网络错误: ${error.message}`);
+            }
+        }
+        
+        async function listFilesStream() {
+            const { queryType, sessionId, prefix } = currentQueryParams;
+            const maxKeys = document.getElementById('maxKeys').value;
+            const batchSize = document.getElementById('batchSize').value;
+            
+            let url = `${API_BASE}/stream`;
+            const params = new URLSearchParams();
+            
+            if (queryType === 'session' && sessionId) {
+                params.append('sessionId', sessionId);
+            } else if (queryType === 'prefix' && prefix) {
+                params.append('prefix', prefix);
+            }
+            
+            params.append('maxKeys', maxKeys);
+            params.append('batchSize', batchSize);
+            
+            url += '?' + params.toString();
+            
+            // 初始化流式显示
+            streamedFiles = [];
+            initStreamDisplay();
+            
+            try {
+                streamEventSource = new EventSource(url);
+                
+                streamEventSource.onmessage = function(event) {
+                    try {
+                        const data = JSON.parse(event.data);
+                        handleStreamData(data);
+                    } catch (error) {
+                        console.error('解析流数据失败:', error);
+                    }
+                };
+                
+                streamEventSource.onerror = function(event) {
+                    console.error('流式连接错误:', event);
+                    streamEventSource.close();
+                    streamEventSource = null;
+                    showStreamError('流式连接中断');
+                };
+                
+                streamEventSource.addEventListener('complete', function(event) {
+                    streamEventSource.close();
+                    streamEventSource = null;
+                    showStreamComplete();
+                });
+                
+            } catch (error) {
+                showError(`启动流式查询失败: ${error.message}`);
+            }
+        }
+        
+        async function getDownloadUrl() {
+            const fileName = document.getElementById('fileName').value;
+            
+            if (!fileName) {
+                showError('请输入文件名');
+                return;
+            }
+            
+            showLoading('正在生成下载链接...');
+            
+            try {
+                const response = await fetch(`${API_BASE}/${encodeURIComponent(fileName)}/download`);
+                const data = await response.json();
+                
+                if (response.ok) {
+                    showDownloadResult(data.downloadUrl, fileName);
+                } else {
+                    showError(`生成下载链接失败: ${data.message || '未知错误'}`);
+                }
+            } catch (error) {
+                showError(`网络错误: ${error.message}`);
+            }
+        }
+        
+        function displayFileList(data) {
+            const resultsDiv = document.getElementById('results');
+            
+            let html = `
+                <div class="stats">
+                    <h3>📊 查询统计</h3>
+                    <p>总文件数: <strong>${data.total}</strong></p>
+                    <p>当前页: <strong>${data.page}/${data.totalPages}</strong></p>
+                    <p>本页显示: <strong>${data.files.length}</strong> 个文件</p>
+                    <p>查询时间: <strong>${new Date().toLocaleString()}</strong></p>
+                </div>
+            `;
+            
+            // 添加分页控件
+            if (data.totalPages > 1) {
+                html += createPaginationControls(data);
+            }
+            
+            if (data.files && data.files.length > 0) {
+                // 按目录结构分组显示文件
+                const groupedFiles = groupFilesByStructure(data.files);
+                html += '<div class="file-list">';
+                
+                Object.keys(groupedFiles).forEach(domain => {
+                    html += `<div class="domain-group">`;
+                    html += `<h4 class="domain-header">🌐 ${domain}</h4>`;
+                    
+                    Object.keys(groupedFiles[domain]).forEach(date => {
+                        html += `<div class="date-group">`;
+                        html += `<h5 class="date-header">📅 ${date}</h5>`;
+                        
+                        Object.keys(groupedFiles[domain][date]).forEach(type => {
+                            if (groupedFiles[domain][date][type].length > 0) {
+                                html += `<div class="type-group">`;
+                                html += `<h6 class="type-header">${getTypeIcon(type)} ${getTypeName(type)}</h6>`;
+                                
+                                groupedFiles[domain][date][type].forEach(file => {
+                                    const sizeKB = (file.size / 1024).toFixed(2);
+                                    const lastModified = new Date(file.lastModified).toLocaleString();
+                                    const fileIcon = getFileIcon(file.name);
+                                    const canPreview = canPreviewFile(file.name);
+                                    const urlInfo = extractUrlInfo(file.name);
+                                    
+                                    html += `
+                                        <div class="file-item">
+                                            <div class="file-info">
+                                                <div class="file-name">${fileIcon} ${getDisplayName(file.name)}</div>
+                                                <div class="storage-path">📁 存储路径: ${getStoragePath(file.name)}</div>
+                                                <div class="file-meta">
+                                                    大小: ${sizeKB} KB | 
+                                                    修改时间: ${lastModified} | 
+                                                    类型: ${getFileType(file.name)}
+                                                </div>
+                                            </div>
+                                            <div class="file-actions">
+                                                ${canPreview ? `<button onclick="previewFile('${file.name}')">👁️ 预览</button>` : ''}
+                                                <button onclick="downloadFile('${file.name}')">⬇️ 下载</button>
+                                                <button onclick="copyFileName('${file.name}')" class="secondary">📋 复制路径</button>
+                                            </div>
+                                        </div>
+                                    `;
+                                });
+                                
+                                html += '</div>';
+                            }
+                        });
+                        
+                        html += '</div>';
+                    });
+                    
+                    html += '</div>';
+                });
+                
+                html += '</div>';
+            } else {
+                html += '<p style="text-align: center; color: #666; font-style: italic;">📭 没有找到文件</p>';
+            }
+            
+            // 在底部再次添加分页控件
+            if (data.totalPages > 1) {
+                html += createPaginationControls(data);
+            }
+            
+            resultsDiv.innerHTML = html;
+        }
+        
+        function initStreamDisplay() {
+             const resultsDiv = document.getElementById('results');
+             
+             let html = `
+                 <div class="stream-stats" id="streamStats">
+                     <h3><div class="stream-loading"></div>🚀 流式加载中...</h3>
+                     <p>已加载文件数: <strong id="streamCount">0</strong></p>
+                     <p>开始时间: <strong>${new Date().toLocaleString()}</strong></p>
+                     <div class="stream-progress">
+                         <div class="stream-progress-bar" id="streamProgressBar" style="width: 0%"></div>
+                     </div>
+                     <div class="stream-controls">
+                         <button onclick="stopStream()" class="secondary">⏹️ 停止加载</button>
+                         <label>
+                             <input type="checkbox" id="enableVirtualScroll" onchange="toggleVirtualScroll()"> 
+                             启用虚拟滚动 (大量文件时推荐)
+                         </label>
+                         <span class="stream-status loading" id="streamStatus">
+                             <div class="stream-loading"></div>
+                             正在连接...
+                         </span>
+                     </div>
+                 </div>
+                 <div id="streamFileContainer" class="file-list" style="position: relative; overflow-y: auto; max-height: ${containerHeight}px;">
+                     <div id="streamFileList"></div>
+                     <div id="virtualScrollSpacer" style="height: 0px;"></div>
+                 </div>
+             `;
+             
+             resultsDiv.innerHTML = html;
+             
+             // 绑定滚动事件
+             const container = document.getElementById('streamFileContainer');
+             if (container) {
+                 container.addEventListener('scroll', throttleScroll);
+             }
+         }
+        
+        function handleStreamData(data) {
+            if (data.type === 'batch') {
+                // 处理批次数据
+                streamedFiles = streamedFiles.concat(data.files);
+                updateStreamDisplay();
+            } else if (data.type === 'progress') {
+                // 更新进度信息
+                updateStreamProgress(data);
+            }
+        }
+        
+        function updateStreamDisplay() {
+            const streamCount = document.getElementById('streamCount');
+            
+            if (streamCount) {
+                streamCount.textContent = streamedFiles.length;
+            }
+            
+            // 使用虚拟滚动或全量渲染
+            if (virtualScrollEnabled) {
+                updateVisibleRange();
+                renderVirtualList();
+            } else {
+                renderFullList();
+            }
+        }
+        
+        function updateStreamProgress(data) {
+            // 可以在这里更新进度条或其他进度指示器
+            console.log('Stream progress:', data);
+        }
+        
+        function showStreamComplete() {
+            const streamStats = document.getElementById('streamStats');
+            if (streamStats) {
+                streamStats.innerHTML = `
+                    <h3>✅ 流式加载完成</h3>
+                    <p>总文件数: <strong>${streamedFiles.length}</strong></p>
+                    <p>完成时间: <strong>${new Date().toLocaleString()}</strong></p>
+                `;
+            }
+        }
+        
+        function showStreamError(message) {
+            const streamStats = document.getElementById('streamStats');
+            if (streamStats) {
+                streamStats.innerHTML = `
+                    <h3>❌ 流式加载错误</h3>
+                    <p>错误信息: <strong>${message}</strong></p>
+                    <p>已加载文件数: <strong>${streamedFiles.length}</strong></p>
+                `;
+            }
+        }
+        
+        function stopStream() {
+             if (streamEventSource) {
+                 streamEventSource.close();
+                 streamEventSource = null;
+                 showStreamComplete();
+             }
+         }
+         
+         // 虚拟滚动相关函数
+         function toggleVirtualScroll() {
+             const checkbox = document.getElementById('enableVirtualScroll');
+             virtualScrollEnabled = checkbox.checked;
+             
+             if (virtualScrollEnabled && streamedFiles.length > 0) {
+                 renderVirtualList();
+             } else if (streamedFiles.length > 0) {
+                 renderFullList();
+             }
+         }
+         
+         function throttleScroll() {
+             if (scrollThrottle) {
+                 clearTimeout(scrollThrottle);
+             }
+             
+             scrollThrottle = setTimeout(() => {
+                 if (virtualScrollEnabled) {
+                     updateVisibleRange();
+                     renderVirtualList();
+                 }
+                 
+                 // 检查是否需要无限滚动加载更多数据
+                 checkInfiniteScroll();
+             }, 16); // 60fps
+         }
+         
+         function checkInfiniteScroll() {
+             const container = document.getElementById('streamFileContainer');
+             if (!container || !streamEventSource) return;
+             
+             const scrollTop = container.scrollTop;
+             const scrollHeight = container.scrollHeight;
+             const clientHeight = container.clientHeight;
+             
+             // 当滚动到底部附近时，触发加载更多
+             const threshold = 100; // 距离底部100px时开始加载
+             if (scrollTop + clientHeight >= scrollHeight - threshold) {
+                 // 这里可以触发加载更多数据的逻辑
+                 // 由于我们使用的是流式加载，数据会自动到达
+                 // 但可以在这里添加一些UI提示
+                 showLoadingMoreIndicator();
+             }
+         }
+         
+         function showLoadingMoreIndicator() {
+             const container = document.getElementById('streamFileContainer');
+             if (!container) return;
+             
+             let indicator = container.querySelector('.loading-more-indicator');
+             if (!indicator) {
+                 indicator = document.createElement('div');
+                 indicator.className = 'loading-more-indicator';
+                 indicator.innerHTML = `
+                     <div style="text-align: center; padding: 20px; color: #666;">
+                         <div class="stream-loading"></div>
+                         正在加载更多文件...
+                     </div>
+                 `;
+                 container.appendChild(indicator);
+                 
+                 // 3秒后自动隐藏
+                 setTimeout(() => {
+                     if (indicator && indicator.parentNode) {
+                         indicator.parentNode.removeChild(indicator);
+                     }
+                 }, 3000);
+             }
+         }
+         
+         function updateVisibleRange() {
+             const container = document.getElementById('streamFileContainer');
+             if (!container) return;
+             
+             const scrollTop = container.scrollTop;
+             const visibleHeight = container.clientHeight;
+             
+             visibleStartIndex = Math.floor(scrollTop / itemHeight);
+             visibleEndIndex = Math.min(
+                 streamedFiles.length,
+                 visibleStartIndex + Math.ceil(visibleHeight / itemHeight) + 5 // 预渲染5个项目
+             );
+         }
+         
+         function renderVirtualList() {
+             if (isRendering) {
+                 renderQueue.push('virtual');
+                 return;
+             }
+             
+             isRendering = true;
+             
+             requestAnimationFrame(() => {
+                 const container = document.getElementById('streamFileList');
+                 const spacer = document.getElementById('virtualScrollSpacer');
+                 const fileContainer = document.getElementById('streamFileContainer');
+                 
+                 if (!container || !spacer || !fileContainer) {
+                     isRendering = false;
+                     return;
+                 }
+                 
+                 // 设置总高度
+                 const totalHeight = streamedFiles.length * itemHeight;
+                 spacer.style.height = totalHeight + 'px';
+                 
+                 // 渲染可见项目
+                 const visibleFiles = streamedFiles.slice(visibleStartIndex, visibleEndIndex);
+                 const offsetY = visibleStartIndex * itemHeight;
+                 
+                 container.style.transform = `translateY(${offsetY}px)`;
+                 container.innerHTML = renderFileItems(visibleFiles);
+                 
+                 // 更新虚拟滚动指示器
+                 updateVirtualScrollIndicator();
+                 
+                 isRendering = false;
+                 
+                 // 处理队列中的渲染请求
+                 if (renderQueue.length > 0) {
+                     renderQueue.shift();
+                     if (renderQueue[0] === 'virtual') {
+                         renderVirtualList();
+                     } else {
+                         renderFullList();
+                     }
+                 }
+             });
+         }
+         
+         function updateVirtualScrollIndicator() {
+             const fileContainer = document.getElementById('streamFileContainer');
+             if (!fileContainer || !virtualScrollEnabled) return;
+             
+             let indicator = fileContainer.querySelector('.virtual-scroll-indicator');
+             if (!indicator) {
+                 indicator = document.createElement('div');
+                 indicator.className = 'virtual-scroll-indicator';
+                 fileContainer.appendChild(indicator);
+             }
+             
+             const totalFiles = streamedFiles.length;
+             const visibleCount = visibleEndIndex - visibleStartIndex;
+             indicator.textContent = `虚拟滚动: ${visibleStartIndex + 1}-${visibleEndIndex}/${totalFiles}`;
+         }
+         
+         function renderFullList() {
+             if (isRendering) {
+                 renderQueue.push('full');
+                 return;
+             }
+             
+             isRendering = true;
+             
+             requestAnimationFrame(() => {
+                 const container = document.getElementById('streamFileList');
+                 const spacer = document.getElementById('virtualScrollSpacer');
+                 const fileContainer = document.getElementById('streamFileContainer');
+                 
+                 if (!container || !spacer) {
+                     isRendering = false;
+                     return;
+                 }
+                 
+                 spacer.style.height = '0px';
+                 container.style.transform = 'translateY(0px)';
+                 container.innerHTML = renderFileItems(streamedFiles);
+                 
+                 // 隐藏虚拟滚动指示器
+                 if (fileContainer) {
+                     const indicator = fileContainer.querySelector('.virtual-scroll-indicator');
+                     if (indicator) {
+                         indicator.remove();
+                     }
+                 }
+                 
+                 isRendering = false;
+                 
+                 // 处理队列中的渲染请求
+                 if (renderQueue.length > 0) {
+                     renderQueue.shift();
+                     if (renderQueue[0] === 'virtual') {
+                         renderVirtualList();
+                     } else {
+                         renderFullList();
+                     }
+                 }
+             });
+         }
+         
+         function renderFileItems(files) {
+             if (!files || files.length === 0) return '';
+             
+             const grouped = groupFilesByStructure(files);
+             let html = '';
+             
+             // 按域名分组显示
+             Object.keys(grouped).forEach(domain => {
+                 html += `<div class="domain-group">`;
+                 html += `<h4 class="domain-header">🌐 ${domain}</h4>`;
+                 
+                 Object.keys(grouped[domain]).forEach(date => {
+                     html += `<div class="date-group">`;
+                     html += `<h5 class="date-header">📅 ${date}</h5>`;
+                     
+                     Object.keys(grouped[domain][date]).forEach(type => {
+                         if (grouped[domain][date][type].length > 0) {
+                             html += `<div class="type-group">`;
+                             html += `<h6 class="type-header">${getTypeIcon(type)} ${getTypeName(type)}</h6>`;
+                             
+                             grouped[domain][date][type].forEach(file => {
+                                 const sizeKB = (file.size / 1024).toFixed(2);
+                                 const lastModified = new Date(file.lastModified).toLocaleString();
+                                 const fileIcon = getFileIcon(file.name);
+                                 const canPreview = canPreviewFile(file.name);
+                                 
+                                 html += `
+                                     <div class="file-item" style="min-height: ${itemHeight}px;">
+                                         <div class="file-info">
+                                             <div class="file-name">${fileIcon} ${getDisplayName(file.name)}</div>
+                                             <div class="storage-path">🔗 原始链接: <a href="${getOriginalUrl(file)}" target="_blank">${getOriginalUrl(file)}</a></div>
+                                             <div class="file-meta">
+                                                 大小: ${sizeKB} KB | 
+                                                 修改时间: ${lastModified} | 
+                                                 类型: ${getFileType(file.name)}
+                                             </div>
+                                         </div>
+                                         <div class="file-actions">
+                                             ${canPreview ? `<button onclick="previewFile('${file.name}')">👁️ 预览</button>` : ''}
+                                             <button onclick="downloadFile('${file.name}')">⬇️ 下载</button>
+                                             <button onclick="copyOriginalUrl('${file.name}', '${getOriginalUrl(file)}')" class="secondary">📋 复制链接</button>
+                                         </div>
+                                     </div>
+                                 `;
+                             });
+                             
+                             html += '</div>';
+                         }
+                     });
+                     
+                     html += '</div>';
+                 });
+                 
+                 html += '</div>';
+             });
+             
+             return html;
+         }
+        
+        function createPaginationControls(data) {
+             const { page, totalPages, hasMore } = data;
+             let paginationHtml = `
+                 <div class="pagination">
+                     <div style="margin-bottom: 10px;">
+                         <span style="color: #666; font-weight: 500;">页码导航 (共 ${totalPages} 页)</span>
+                     </div>
+                     <div style="display: inline-flex; gap: 5px; align-items: center; flex-wrap: wrap; justify-content: center;">
+             `;
+             
+             // 首页按钮
+             if (page > 1) {
+                 paginationHtml += `<button onclick="listFiles(1)">⏮️ 首页</button>`;
+                 paginationHtml += `<button onclick="listFiles(${page - 1})">⬅️ 上一页</button>`;
+             } else {
+                 paginationHtml += `<button disabled>⏮️ 首页</button>`;
+                 paginationHtml += `<button disabled>⬅️ 上一页</button>`;
+             }
+             
+             // 页码按钮
+             const startPage = Math.max(1, page - 2);
+             const endPage = Math.min(totalPages, page + 2);
+             
+             if (startPage > 1) {
+                 paginationHtml += `<span style="padding: 8px; color: #666;">...</span>`;
+             }
+             
+             for (let i = startPage; i <= endPage; i++) {
+                 if (i === page) {
+                     paginationHtml += `<button class="current-page">${i}</button>`;
+                 } else {
+                     paginationHtml += `<button onclick="listFiles(${i})">${i}</button>`;
+                 }
+             }
+             
+             if (endPage < totalPages) {
+                 paginationHtml += `<span style="padding: 8px; color: #666;">...</span>`;
+             }
+             
+             // 下一页和末页按钮
+             if (hasMore) {
+                 paginationHtml += `<button onclick="listFiles(${page + 1})">下一页 ➡️</button>`;
+                 paginationHtml += `<button onclick="listFiles(${totalPages})">末页 ⏭️</button>`;
+             } else {
+                 paginationHtml += `<button disabled>下一页 ➡️</button>`;
+                 paginationHtml += `<button disabled>末页 ⏭️</button>`;
+             }
+             
+             // 跳转输入框
+             paginationHtml += `
+                     </div>
+                     <div style="margin-top: 15px; display: flex; align-items: center; justify-content: center; gap: 8px;">
+                         <span style="color: #666;">快速跳转到第</span>
+                         <input type="number" id="jumpToPage_${Date.now()}" min="1" max="${totalPages}" value="${page}" placeholder="页码">
+                         <span style="color: #666;">页</span>
+                         <button onclick="jumpToPage('jumpToPage_${Date.now()}')">🔍 跳转</button>
+                     </div>
+                 </div>
+             `;
+             
+             return paginationHtml;
+         }
+        
+        function jumpToPage(inputId) {
+             const jumpInput = document.getElementById(inputId);
+             if (!jumpInput) return;
+             
+             const targetPage = parseInt(jumpInput.value);
+             const maxPage = parseInt(jumpInput.getAttribute('max'));
+             
+             if (targetPage && targetPage >= 1 && targetPage <= maxPage) {
+                 listFiles(targetPage);
+             } else {
+                 alert(`请输入有效的页码 (1-${maxPage})`);
+                 jumpInput.focus();
+             }
+         }
+        
+        // 按目录结构分组文件
+        function groupFilesByStructure(files) {
+            const grouped = {};
+            
+            files.forEach(file => {
+                const pathParts = file.name.split('/');
+                if (pathParts.length >= 6 && pathParts[0] === 'domain') {
+                    const domain = pathParts[1];
+                    const date = `${pathParts[2]}/${pathParts[3]}/${pathParts[4]}`;
+                    const type = pathParts[5]; // pages, sessions, index
+                    
+                    if (!grouped[domain]) grouped[domain] = {};
+                    if (!grouped[domain][date]) grouped[domain][date] = {};
+                    if (!grouped[domain][date][type]) grouped[domain][date][type] = [];
+                    
+                    grouped[domain][date][type].push(file);
+                } else {
+                    // 处理其他格式的文件
+                    const domain = 'other';
+                    const date = 'unknown';
+                    const type = 'misc';
+                    
+                    if (!grouped[domain]) grouped[domain] = {};
+                    if (!grouped[domain][date]) grouped[domain][date] = {};
+                    if (!grouped[domain][date][type]) grouped[domain][date][type] = [];
+                    
+                    grouped[domain][date][type].push(file);
+                }
+            });
+            
+            return grouped;
+        }
+        
+        // 获取类型图标
+        function getTypeIcon(type) {
+            const icons = {
+                'pages': '📄',
+                'sessions': '🗂️',
+                'index': '📇',
+                'misc': '📁'
+            };
+            return icons[type] || '📄';
+        }
+        
+        // 获取类型名称
+        function getTypeName(type) {
+            const names = {
+                'pages': '页面内容',
+                'sessions': '会话数据',
+                'index': '索引文件',
+                'misc': '其他文件'
+            };
+            return names[type] || type;
+        }
+        
+        // 获取显示名称（原始URL）
+        function getDisplayName(fileName) {
+            const pathParts = fileName.split('/');
+            if (pathParts.length >= 6 && pathParts[0] === 'domain') {
+                const domain = pathParts[1];
+                const type = pathParts[5];
+                const actualFileName = pathParts[pathParts.length - 1];
+                
+                if (type === 'pages') {
+                    // 返回完整的原始URL
+                    const urlPath = pathParts.slice(6, -1).join('/');
+                    if (urlPath === '_root') {
+                        return `https://${domain}/`;
+                    } else {
+                        return `https://${domain}/${urlPath}`;
+                    }
+                } else if (type === 'media') {
+                    // 对于媒体文件，尝试从文件名中提取原始URL
+                    // 媒体文件路径格式: domain/{domain}/{year}/{month}/{day}/media/{type}/{hash_fileName}
+                    if (pathParts.length >= 8) {
+                        const fileName = pathParts[7]; // 获取文件名
+                        // 尝试从文件名中移除hash前缀来获取原始文件名
+                        const originalFileName = fileName.includes('_') ? fileName.split('_').slice(1).join('_') : fileName;
+                        return `https://${domain}/${originalFileName}`;
+                    }
+                    return `https://${domain}/`;
+                } else if (type === 'sessions') {
+                    return `会话数据: ${actualFileName}`;
+                } else {
+                    return `${domain} - ${actualFileName}`;
+                }
+            }
+            return fileName;
+        }
+        
+        // 获取存储路径描述
+        function getStoragePath(fileName) {
+            return fileName;
+        }
+        
+        // 获取原始URL
+        function getOriginalUrl(file) {
+            // 优先使用traceability信息中的原始URL
+            if (file.traceability && file.traceability.originalUrl) {
+                return file.traceability.originalUrl;
+            }
+            
+            // 如果文件对象直接包含原始URL信息
+            if (file.originalUrl) {
+                return file.originalUrl;
+            }
+            
+            // 后备方案：从文件名解析URL（兼容旧数据）
+            const pathParts = file.name.split('/');
+            if (pathParts.length >= 6 && pathParts[0] === 'domain') {
+                const domain = pathParts[1];
+                const type = pathParts[5];
+                
+                if (type === 'pages') {
+                    const urlPath = pathParts.slice(6, -1).join('/');
+                    if (urlPath === '_root') {
+                        return `https://${domain}/`;
+                    } else {
+                        return `https://${domain}/${urlPath}`;
+                    }
+                } else if (type === 'media') {
+                    // 对于媒体文件，尝试从文件名中提取原始信息
+                    if (pathParts.length >= 8) {
+                        const fileName = pathParts[7];
+                        const originalFileName = fileName.includes('_') ? fileName.split('_').slice(1).join('_') : fileName;
+                        return `https://${domain}/${originalFileName}`;
+                    }
+                    return `https://${domain}/`;
+                } else if (type === 'sessions') {
+                    return `会话数据: ${pathParts[pathParts.length - 1]}`;
+                }
+            }
+            
+            // 默认返回文件名
+            return file.name;
+        }
+        
+        // 复制原始URL到剪贴板
+        function copyOriginalUrl(fileName, originalUrl) {
+            if (navigator.clipboard) {
+                navigator.clipboard.writeText(originalUrl).then(() => {
+                    showResult('成功', `已复制原始链接: ${originalUrl}`, 'success');
+                }).catch(err => {
+                    console.error('复制失败:', err);
+                    fallbackCopyText(originalUrl);
+                });
+            } else {
+                fallbackCopyText(originalUrl);
+            }
+        }
+        
+        // 备用复制方法
+        function fallbackCopyText(text) {
+            const textArea = document.createElement('textarea');
+            textArea.value = text;
+            document.body.appendChild(textArea);
+            textArea.select();
+            try {
+                document.execCommand('copy');
+                showResult('成功', `已复制原始链接: ${text}`, 'success');
+            } catch (err) {
+                console.error('复制失败:', err);
+                showResult('错误', '复制失败，请手动复制', 'error');
+            }
+            document.body.removeChild(textArea);
+        }
+        
+        // 提取URL信息
+        function extractUrlInfo(fileName) {
+            const pathParts = fileName.split('/');
+            if (pathParts.length >= 6 && pathParts[0] === 'domain' && pathParts[5] === 'pages') {
+                const domain = pathParts[1];
+                const urlPath = pathParts.slice(6, -1).join('/');
+                if (urlPath === '_root') {
+                    return `https://${domain}/`;
+                } else {
+                    return `https://${domain}/${urlPath}`;
+                }
+            }
+            return null;
+        }
+        
+        // 获取文件类型
+        function getFileType(fileName) {
+            const pathParts = fileName.split('/');
+            const actualFileName = pathParts[pathParts.length - 1];
+            
+            if (actualFileName === 'index.json') return '页面内容';
+            if (actualFileName === 'index.png') return '页面截图';
+            if (actualFileName === 'metadata.json') return '页面元数据';
+            if (actualFileName.startsWith('session-')) return '会话数据';
+            if (actualFileName.includes('index.json')) return '索引文件';
+            
+            const ext = actualFileName.toLowerCase().split('.').pop();
+            return ext.toUpperCase() + ' 文件';
+        }
+        
+        function showDownloadResult(downloadUrl, fileName) {
+            const resultsDiv = document.getElementById('results');
+            
+            // 修复域名问题
+            const fixedUrl = downloadUrl.replace('http://minio:9000', 'http://localhost:9001');
+            
+            const html = `
+                <div class="response success">
+                    <h3>✅ 下载链接生成成功</h3>
+                    <p><strong>文件名:</strong> ${fileName}</p>
+                    <p><strong>下载链接:</strong></p>
+                    <p><a href="${fixedUrl}" target="_blank" style="word-break: break-all;">${fixedUrl}</a></p>
+                    <p><em>注意: 链接有效期为1小时</em></p>
+                    <button onclick="window.open('${fixedUrl}', '_blank')">🚀 打开下载链接</button>
+                    <button onclick="copyToClipboard('${fixedUrl}')" class="secondary">📋 复制链接</button>
+                </div>
+            `;
+            
+            resultsDiv.innerHTML = html;
+        }
+        
+        function showLoading(message) {
+            const resultsDiv = document.getElementById('results');
+            resultsDiv.innerHTML = `
+                <div class="loading" style="text-align: center; padding: 40px; color: #666;">
+                    <div style="margin-bottom: 15px;">
+                        <div style="display: inline-block; width: 20px; height: 20px; border: 3px solid #f3f3f3; border-top: 3px solid #007bff; border-radius: 50%; animation: spin 1s linear infinite;"></div>
+                    </div>
+                    <div>⏳ ${message}</div>
+                </div>
+                <style>
+                    @keyframes spin {
+                        0% { transform: rotate(0deg); }
+                        100% { transform: rotate(360deg); }
+                    }
+                </style>
+            `;
+        }
+        
+        function showError(message) {
+            const resultsDiv = document.getElementById('results');
+            resultsDiv.innerHTML = `<div class="response error">❌ ${message}</div>`;
+        }
+        
+        function clearResults() {
+            document.getElementById('results').innerHTML = '';
+        }
+        
+        async function downloadFile(fileName) {
+            try {
+                const response = await fetch(`${API_BASE}/${encodeURIComponent(fileName)}/download`);
+                const data = await response.json();
+                
+                if (response.ok) {
+                    // 修复域名问题：将 minio:9000 替换为 localhost:9001
+                    const fixedUrl = data.downloadUrl.replace('http://minio:9000', 'http://localhost:9001');
+                    window.open(fixedUrl, '_blank');
+                } else {
+                    alert(`生成下载链接失败: ${data.message || '未知错误'}`);
+                }
+            } catch (error) {
+                alert(`网络错误: ${error.message}`);
+            }
+        }
+        
+        function copyFileName(fileName) {
+            navigator.clipboard.writeText(fileName).then(() => {
+                alert('文件名已复制到剪贴板');
+            }).catch(() => {
+                // 降级方案
+                const textArea = document.createElement('textarea');
+                textArea.value = fileName;
+                document.body.appendChild(textArea);
+                textArea.select();
+                document.execCommand('copy');
+                document.body.removeChild(textArea);
+                alert('文件名已复制到剪贴板');
+            });
+        }
+        
+        function copyToClipboard(text) {
+            navigator.clipboard.writeText(text).then(() => {
+                alert('链接已复制到剪贴板');
+            }).catch(() => {
+                // 降级方案
+                const textArea = document.createElement('textarea');
+                textArea.value = text;
+                document.body.appendChild(textArea);
+                textArea.select();
+                document.execCommand('copy');
+                document.body.removeChild(textArea);
+                alert('链接已复制到剪贴板');
+            });
+        }
+        
+        // 获取文件类型图标
+        function getFileIcon(fileName) {
+            const ext = fileName.toLowerCase().split('.').pop();
+            
+            // 图片文件
+            if (['jpg', 'jpeg', 'png', 'gif', 'webp', 'svg', 'bmp', 'ico'].includes(ext)) {
+                return '🖼️';
+            }
+            // 视频文件
+            if (['mp4', 'avi', 'mov', 'wmv', 'flv', 'webm', 'mkv'].includes(ext)) {
+                return '🎬';
+            }
+            // 音频文件
+            if (['mp3', 'wav', 'aac', 'ogg', 'm4a'].includes(ext)) {
+                return '🎵';
+            }
+            // 文档文件
+            if (['pdf', 'doc', 'docx', 'xls', 'xlsx', 'ppt', 'pptx'].includes(ext)) {
+                return '📄';
+            }
+            // 压缩包文件
+            if (['zip', 'rar', '7z', 'tar', 'gz'].includes(ext)) {
+                return '📦';
+            }
+            // 文本文件
+            if (['txt', 'md', 'json', 'xml', 'html', 'css', 'js', 'ts'].includes(ext)) {
+                return '📝';
+            }
+            // 默认文件图标
+            return '📄';
+        }
+        
+        // 检查文件是否可以预览
+        function canPreviewFile(fileName) {
+            const ext = fileName.toLowerCase().split('.').pop();
+            
+            // 支持预览的文件类型
+            const previewableTypes = [
+                // 图片
+                'jpg', 'jpeg', 'png', 'gif', 'webp', 'svg', 'bmp',
+                // 视频
+                'mp4', 'webm', 'ogg',
+                // 音频
+                'mp3', 'wav', 'ogg', 'm4a',
+                // 文档
+                'pdf',
+                // 文本
+                'txt', 'md', 'json', 'xml', 'html', 'css', 'js', 'ts'
+            ];
+            
+            return previewableTypes.includes(ext);
+        }
+        
+        // 预览文件
+        async function previewFile(fileName) {
+            try {
+                const response = await fetch(`${API_BASE}/${encodeURIComponent(fileName)}/download`);
+                const data = await response.json();
+                
+                if (response.ok) {
+                    // 修复域名问题
+                    const fixedUrl = data.downloadUrl.replace('http://minio:9000', 'http://localhost:9001');
+                    showPreview(fileName, fixedUrl);
+                } else {
+                    alert(`获取预览链接失败: ${data.message || '未知错误'}`);
+                }
+            } catch (error) {
+                alert(`网络错误: ${error.message}`);
+            }
+        }
+        
+        // 显示预览模态框
+        function showPreview(fileName, fileUrl) {
+            const modal = document.getElementById('previewModal');
+            const title = document.getElementById('previewTitle');
+            const body = document.getElementById('previewBody');
+            
+            title.textContent = `预览: ${fileName}`;
+            
+            const ext = fileName.toLowerCase().split('.').pop();
+            let previewContent = '';
+            
+            // 根据文件类型生成预览内容
+            if (['jpg', 'jpeg', 'png', 'gif', 'webp', 'svg', 'bmp'].includes(ext)) {
+                // 图片预览
+                previewContent = `<img src="${fileUrl}" alt="${fileName}" class="preview-image" onerror="showPreviewError('图片加载失败')">`;
+            } else if (['mp4', 'webm', 'ogg'].includes(ext)) {
+                // 视频预览
+                previewContent = `
+                    <video controls class="preview-video" preload="metadata">
+                        <source src="${fileUrl}" type="video/${ext}">
+                        您的浏览器不支持视频播放。
+                    </video>
+                `;
+            } else if (['mp3', 'wav', 'ogg', 'm4a'].includes(ext)) {
+                // 音频预览
+                previewContent = `
+                    <audio controls class="preview-audio" preload="metadata">
+                        <source src="${fileUrl}" type="audio/${ext}">
+                        您的浏览器不支持音频播放。
+                    </audio>
+                `;
+            } else if (ext === 'pdf') {
+                // PDF预览
+                previewContent = `<iframe src="${fileUrl}" class="preview-document" frameborder="0"></iframe>`;
+            } else if (['txt', 'md', 'json', 'xml', 'html', 'css', 'js', 'ts'].includes(ext)) {
+                // 文本文件预览
+                previewContent = '<div class="loading">⏳ 正在加载文本内容...</div>';
+                
+                // 异步加载文本内容
+                fetch(fileUrl)
+                    .then(response => response.text())
+                    .then(text => {
+                        body.innerHTML = `<div class="preview-text">${escapeHtml(text)}</div>`;
+                    })
+                    .catch(error => {
+                        body.innerHTML = '<div class="preview-unsupported">❌ 文本内容加载失败</div>';
+                    });
+            } else {
+                // 不支持的文件类型
+                previewContent = `
+                    <div class="preview-unsupported">
+                        <h3>🚫 暂不支持预览此文件类型</h3>
+                        <p>文件类型: .${ext}</p>
+                        <p>请点击下载按钮下载文件查看</p>
+                        <button onclick="window.open('${fileUrl}', '_blank')">⬇️ 下载文件</button>
+                    </div>
+                `;
+            }
+            
+            body.innerHTML = previewContent;
+            modal.style.display = 'block';
+        }
+        
+        // 关闭预览模态框
+        function closePreview() {
+            const modal = document.getElementById('previewModal');
+            modal.style.display = 'none';
+        }
+        
+        // 显示预览错误
+        function showPreviewError(message) {
+            const body = document.getElementById('previewBody');
+            body.innerHTML = `<div class="preview-unsupported">❌ ${message}</div>`;
+        }
+        
+        // HTML转义函数
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+        
+        // 会话管理相关函数
+        async function getActiveSessions() {
+            try {
+                const response = await fetch(`/api/crawler/sessions`);
+                const data = await response.json();
+                displayResults('活跃会话列表', data);
+            } catch (error) {
+                displayResults('获取失败', { error: error.message });
+            }
+        }
+        
+        async function getSessionStatus() {
+            const sessionId = document.getElementById('sessionIdDetail').value;
+            if (!sessionId) {
+                alert('请输入会话ID');
+                return;
+            }
+            
+            try {
+                const response = await fetch(`/api/crawler/session/${sessionId}`);
+                const data = await response.json();
+                displayResults(`会话状态 - ${sessionId}`, data);
+            } catch (error) {
+                displayResults('获取失败', { error: error.message });
+            }
+        }
+        
+        async function getSessionMedia() {
+            const sessionId = document.getElementById('sessionIdDetail').value;
+            if (!sessionId) {
+                alert('请输入会话ID');
+                return;
+            }
+            
+            try {
+                const response = await fetch(`/api/media/session/${sessionId}/media`);
+                const data = await response.json();
+                displayResults(`会话媒体文件 - ${sessionId}`, data);
+            } catch (error) {
+                displayResults('获取失败', { error: error.message });
+            }
+        }
+        
+        async function getMediaStats() {
+            try {
+                const response = await fetch(`/api/media/media/stats`);
+                const data = await response.json();
+                displayResults('媒体文件统计', data);
+            } catch (error) {
+                displayResults('获取失败', { error: error.message });
+            }
+        }
+        
+        async function searchMedia() {
+            const query = document.getElementById('searchQuery').value;
+            const sessionId = document.getElementById('searchSessionId').value;
+            
+            if (!query) {
+                alert('请输入搜索关键词');
+                return;
+            }
+            
+            try {
+                let url = `/api/media/media/search?query=${encodeURIComponent(query)}`;
+                if (sessionId) {
+                    url += `&sessionId=${encodeURIComponent(sessionId)}`;
+                }
+                
+                const response = await fetch(url);
+                const data = await response.json();
+                displayResults('搜索结果', data);
+            } catch (error) {
+                displayResults('搜索失败', { error: error.message });
+            }
+        }
+        
+        // 通用结果显示函数
+        function displayResults(title, data) {
+            const resultsDiv = document.getElementById('results');
+            
+            let html = `
+                <div class="stats">
+                    <h3>📊 ${title}</h3>
+                    <p>查询时间: <strong>${new Date().toLocaleString()}</strong></p>
+                </div>
+                <div class="response success">
+                    <pre>${JSON.stringify(data, null, 2)}</pre>
+                </div>
+            `;
+            
+            resultsDiv.innerHTML = html;
+        }
+        
+        // 点击模态框外部关闭预览
+        window.onclick = function(event) {
+            const modal = document.getElementById('previewModal');
+            if (event.target === modal) {
+                closePreview();
+            }
+        }
+        
+        // 页面加载时自动查询所有文件
+        window.onload = function() {
+            console.log('MinIO 文件查询测试页面已加载');
+        };
+    </script>
+</body>
+</html>
