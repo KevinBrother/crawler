@@ -8,7 +8,7 @@ async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule);
 
   // 配置静态文件服务
-  app.useStaticAssets(join(__dirname, "..", "public"));
+  app.useStaticAssets(join(__dirname, "..", "..", "public"));
 
   // 配置Swagger文档
   const config = new DocumentBuilder()

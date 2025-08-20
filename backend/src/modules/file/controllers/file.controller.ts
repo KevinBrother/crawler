@@ -14,8 +14,8 @@ import {
   ApiParam,
   ApiQuery,
 } from '@nestjs/swagger';
-import { StorageService } from '../core/storage/storage.service';
-import { METADATA_KEYS_RETRIEVAL } from '../shared/constants/metadata.constants';
+import { StorageService } from '../../../core/storage/storage.service';
+import { METADATA_KEYS_RETRIEVAL } from '../../../common/constants/metadata.constants';
 
 @ApiTags('files')
 @Controller('api/files')

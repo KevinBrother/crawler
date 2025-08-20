@@ -1,6 +1,6 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { Page } from 'playwright';
-import { MediaTypeConfig, MediaFileInfo } from '../../shared/interfaces/crawler.interface';
+import { MediaTypeConfig, MediaFileInfo } from '../../crawler/interfaces/crawler.interface';
 
 @Injectable()
 export class MediaDetectorService {

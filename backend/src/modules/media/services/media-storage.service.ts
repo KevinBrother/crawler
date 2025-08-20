@@ -1,7 +1,7 @@
 import { Inject, Injectable, Logger } from "@nestjs/common";
-import { StorageService } from "../../core/storage/storage.service";
-import { MediaFileInfo } from "../../shared/interfaces/crawler.interface";
-import { METADATA_KEYS_STORAGE, FILE_TYPES } from '../../shared/constants/metadata.constants';
+import { StorageService } from "../../../core/storage/storage.service";
+import { MediaFileInfo } from "../../crawler/interfaces/crawler.interface";
+import { METADATA_KEYS_STORAGE, FILE_TYPES } from '../../../common/constants/metadata.constants';
 
 @Injectable()
 export class MediaStorageService {
@@ -212,7 +212,7 @@ export class MediaStorageService {
 
       // 使用新的路径生成方式
       const { PathGenerator } = await import(
-        "../../shared/utils/path-generator.util"
+        "../../../common/utils/path-generator.util"
       );
       const sessionPath = PathGenerator.generateSessionPath(sessionId, domain);
       const filePath = `${sessionPath}/media-metadata-${sessionId}.json`;

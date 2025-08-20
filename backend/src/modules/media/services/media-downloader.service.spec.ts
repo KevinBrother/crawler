@@ -1,8 +1,8 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { describe, it, expect, beforeEach, afterAll, vi } from 'vitest';
 import { MediaDownloaderService } from './media-downloader.service';
-import { StorageService } from '../../core/storage/storage.service';
-import { MediaFileInfo, MediaCrawlOptions } from '../../shared/interfaces/crawler.interface';
+import { StorageService } from '../../../core/storage/storage.service';
+import { MediaFileInfo, MediaCrawlOptions } from '../../crawler/interfaces/crawler.interface';
 import axios from 'axios';
 
 // Mock axios
@@ -21,10 +21,15 @@ describe('MediaDownloaderService', () => {
 
   const mockMediaFile: MediaFileInfo = {
     url: 'https://example.com/image.jpg',
+    originalUrl: 'https://example.com/image.jpg',
     type: 'image',
     extension: 'jpg',
     fileName: 'test-image.jpg',
     sourceUrl: 'https://example.com/page.html',
+    fileSize: 1024,
+    downloadTime: '2023-01-01T00:00:00.000Z',
+    sessionId: 'test-session',
+    mimeType: 'image/jpeg'
   };
 
   const mockOptions: MediaCrawlOptions = {

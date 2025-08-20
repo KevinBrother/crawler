@@ -14,15 +14,13 @@ import {
   ApiOperation,
   ApiResponse as SwaggerApiResponse,
   ApiParam,
-  ApiBody,
 } from '@nestjs/swagger';
-import { WebsiteCrawlerService } from '../services/crawler/website-crawler.service';
+import { WebsiteCrawlerService } from '../services/website-crawler.service';
 import {
   CrawlRequest,
   CrawlResponse,
   CrawSession,
-  ApiResponse,
-} from '../shared/interfaces/crawler.interface';
+} from '../interfaces/crawler.interface';
 
 @ApiTags('crawler')
 @Controller('api/crawler')
@@ -36,10 +34,6 @@ export class CrawlerController {
   /**
    * 开始爬取网站
    */
-  @ApiOperation({ summary: '开始爬取网站', description: '启动网站爬取任务，返回会话ID用于跟踪进度' })
-  @ApiBody({ description: '爬取请求参数，包含URL、最大页面数、是否截图等配置' })
-  @SwaggerApiResponse({ status: 202, description: '爬取任务已启动，返回会话ID和状态信息' })
-  @SwaggerApiResponse({ status: 400, description: '请求参数错误' })
   @Post('crawl')
   @HttpCode(HttpStatus.ACCEPTED)
   async crawlWebsite(@Body() request: CrawlRequest): Promise<CrawlResponse> {
@@ -113,15 +107,6 @@ export class CrawlerController {
       timestamp: new Date().toISOString(),
     };
   }
-
-
-
-      
-
-
-
-
-
 
   /**
    * 验证爬取请求参数

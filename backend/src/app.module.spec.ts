@@ -5,12 +5,12 @@ import { Module } from '@nestjs/common';
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import { AppModule } from './app.module';
 import { AppController } from './app.controller';
-import { CrawlerModule } from './modules/crawler.module';
-import { CrawlerController } from './controllers/crawler.controller';
-import { WebsiteCrawlerService } from './services/crawler/website-crawler.service';
+import { CrawlerModule } from './modules/crawler/crawler.module';
+import { CrawlerController } from './modules/crawler/controllers/crawler.controller';
+import { WebsiteCrawlerService } from './modules/crawler/services/website-crawler.service';
 
-// Mock CrawlerModule 以避免复杂的依赖
-vi.mock('./modules/crawler.module', () => ({
+// Mock modules
+vi.mock('./modules/crawler/crawler.module', () => ({
   CrawlerModule: {
     controllers: [],
     providers: [],
@@ -18,15 +18,15 @@ vi.mock('./modules/crawler.module', () => ({
   },
 }));
 
-// Mock 所有服务依赖
+// Mock services
 vi.mock('./core/browser/browser.service');
 vi.mock('./core/storage/storage.service');
-vi.mock('./services/crawler/website-crawler.service');
-vi.mock('./services/crawler/link-manager.service');
-vi.mock('./services/content/content-extractor.service');
-vi.mock('./services/media/media-detector.service');
-vi.mock('./services/media/media-downloader.service');
-vi.mock('./services/media/media-storage.service');
+vi.mock('./modules/crawler/services/website-crawler.service');
+vi.mock('./modules/crawler/services/link-manager.service');
+vi.mock('./modules/content/services/content-extractor.service');
+vi.mock('./modules/media/services/media-detector.service');
+vi.mock('./modules/media/services/media-downloader.service');
+vi.mock('./modules/media/services/media-storage.service');
 
 describe('AppModule', () => {
   let module: TestingModule;
@@ -77,7 +77,7 @@ describe('AppModule', () => {
       expect(typeof AppModule).toBe('function');
       // 如果元数据存在，验证长度
       if (imports) {
-        expect(imports).toHaveLength(2); // ConfigModule 和 CrawlerModule
+        expect(imports).toHaveLength(6); // ConfigModule, CoreModule, CrawlerModule, ContentModule, MediaModule, FileModule
       }
     });
 

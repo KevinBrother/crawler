@@ -1,5 +1,5 @@
 import { Injectable, Logger } from '@nestjs/common';
-import { LinkInfo } from '../../shared/interfaces/crawler.interface';
+import { LinkInfo } from '../interfaces/crawler.interface';
 
 @Injectable()
 export class LinkManagerService {

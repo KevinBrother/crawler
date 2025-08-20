@@ -1,8 +1,8 @@
 import { Injectable, Logger } from '@nestjs/common';
 import * as Minio from 'minio';
-import { PageData } from '../../shared/interfaces/crawler.interface';
-import { PathGenerator } from '../../shared/utils/path-generator.util';
-import { METADATA_KEYS_STORAGE, FILE_TYPES } from '../../shared/constants/metadata.constants';
+import { PageData } from '../../modules/crawler/interfaces/crawler.interface';
+import { PathGenerator } from '../../common/utils/path-generator.util';
+import { METADATA_KEYS_STORAGE, FILE_TYPES } from '../../common/constants/metadata.constants';
 
 @Injectable()
 export class StorageService {

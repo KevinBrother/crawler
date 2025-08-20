@@ -1,19 +1,19 @@
 import { Inject, Injectable, Logger } from '@nestjs/common';
-import { BrowserService } from '../../core/browser/browser.service';
-import { StorageService } from '../../core/storage/storage.service';
-import { ContentExtractorService } from '../content/content-extractor.service';
+import { BrowserService } from '../../../core/browser/browser.service';
+import { StorageService } from '../../../core/storage/storage.service';
+import { ContentExtractorService } from '../../content/services/content-extractor.service';
 import { LinkManagerService } from './link-manager.service';
-import { MediaDetectorService } from '../media/media-detector.service';
-import { MediaDownloaderService } from '../media/media-downloader.service';
-import { MediaStorageService } from '../media/media-storage.service';
+import { MediaDetectorService } from '../../media/services/media-detector.service';
+import { MediaDownloaderService } from '../../media/services/media-downloader.service';
+import { MediaStorageService } from '../../media/services/media-storage.service';
 import {
   CrawlRequest,
   CrawlResponse,
   CrawSession,
   PageData,
-} from '../../shared/interfaces/crawler.interface';
-import { PathGenerator } from '../../shared/utils/path-generator.util';
-import { defaultCrawlerConfig } from '../../config/app.config';
+} from '../interfaces/crawler.interface';
+import { PathGenerator } from '../../../common/utils/path-generator.util';
+import { defaultCrawlerConfig } from '../../../config/app.config';
 
 @Injectable()
 export class WebsiteCrawlerService {

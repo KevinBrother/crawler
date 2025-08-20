@@ -1,10 +1,10 @@
 import { Injectable, Logger, Inject } from '@nestjs/common';
-import { StorageService } from '../../core/storage/storage.service';
-import { MediaFileInfo, MediaDownloadResult, MediaCrawlOptions } from '../../shared/interfaces/crawler.interface';
-import { PathGenerator } from '../../shared/utils/path-generator.util';
+import { StorageService } from '../../../core/storage/storage.service';
+import { MediaFileInfo, MediaDownloadResult, MediaCrawlOptions } from '../../crawler/interfaces/crawler.interface';
+import { PathGenerator } from '../../../common/utils/path-generator.util';
 import * as crypto from 'crypto';
 import axios from 'axios';
-import { METADATA_KEYS_STORAGE } from '../../shared/constants/metadata.constants';
+import { METADATA_KEYS_STORAGE } from '../../../common/constants/metadata.constants';
 
 @Injectable()
 export class MediaDownloaderService {

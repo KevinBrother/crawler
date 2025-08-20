@@ -1,11 +1,11 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import { MediaStorageService } from './media-storage.service';
-import { StorageService } from '../../core/storage/storage.service';
-import { MediaFileInfo } from '../../shared/interfaces/crawler.interface';
+import { StorageService } from '../../../core/storage/storage.service';
+import { MediaFileInfo } from '../../crawler/interfaces/crawler.interface';
 
 // Mock PathGenerator
-vi.mock('../../shared/utils/path-generator.util', () => ({
+vi.mock('../../../common/utils/path-generator.util', () => ({
   PathGenerator: {
     generateSessionPath: vi.fn().mockReturnValue('/sessions/test-session')
   }
@@ -19,14 +19,19 @@ describe('MediaStorageService', () => {
 
   const mockMediaFile: MediaFileInfo = {
     url: 'https://example.com/image.jpg',
+    originalUrl: 'https://example.com/image.jpg',
     type: 'image',
     extension: 'jpg',
     fileName: 'test-image.jpg',
     sourceUrl: 'https://example.com/page.html',
     size: 1024000,
+    fileSize: 1024000,
     storagePath: '/sessions/test-session/media/test-image.jpg',
     md5Hash: 'abc123def456',
     downloadedAt: '2024-01-01T00:00:00.000Z',
+    downloadTime: '2024-01-01T00:00:00.000Z',
+    sessionId: 'test-session',
+    mimeType: 'image/jpeg',
     metadata: {
       alt: 'Test image',
       title: 'Test title'
@@ -456,14 +461,19 @@ describe('MediaStorageService', () => {
     it('应该处理包含null/undefined字段的媒体文件', () => {
       const incompleteFile: MediaFileInfo = {
         url: 'https://example.com/incomplete.jpg',
+        originalUrl: 'https://example.com/incomplete.jpg',
         type: 'image',
         extension: 'jpg',
         fileName: 'incomplete.jpg',
         sourceUrl: 'https://example.com/page.html',
         size: undefined,
+        fileSize: 0,
         storagePath: undefined,
         md5Hash: undefined,
         downloadedAt: undefined,
+        downloadTime: '2023-01-01T00:00:00.000Z',
+        sessionId: 'test-session',
+        mimeType: 'image/jpeg',
         metadata: undefined
       };
       
