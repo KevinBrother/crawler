@@ -1,5 +1,5 @@
 // 导入共享的API类型定义
-export * from '@crawler/shared-types';
+export * from '@crawler/backend/types';
 
 // 重新导出常用类型，保持向后兼容
 export type {
@@ -20,4 +20,4 @@ export type {
   StopCrawlResponse,
   MediaTypeConfig,
   MediaCrawlOptions
-} from '@crawler/shared-types';
+} from '@crawler/backend/types';

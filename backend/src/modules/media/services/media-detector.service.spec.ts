@@ -1,7 +1,7 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import { MediaDetectorService } from './media-detector.service';
-import { MediaTypeConfig } from '../../shared/interfaces/crawler.interface';
+import { MediaTypeConfig } from '../../../types';
 import { Page } from 'playwright';
 
 describe('MediaDetectorService', () => {

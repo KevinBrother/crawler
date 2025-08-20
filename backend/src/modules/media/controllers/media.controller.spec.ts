@@ -1,10 +1,10 @@
 import { describe, it, expect, beforeEach, vi, Mocked } from "vitest";
 import { MediaController } from "./media.controller";
-import { StorageService } from "../core/storage/storage.service";
+import { StorageService } from "../../../core/storage/storage.service";
 import { MediaStorageService } from "../services/media/media-storage.service";
 import {
   MediaFileInfo,
-} from "../shared/interfaces/crawler.interface";
+} from '../../../types';
 
 describe("MediaController", () => {
   let controller: MediaController;

@@ -7,7 +7,7 @@ import { LinkManagerService } from './link-manager.service';
 import { MediaDetectorService } from '../media/media-detector.service';
 import { MediaDownloaderService } from '../media/media-downloader.service';
 import { MediaStorageService } from '../media/media-storage.service';
-import { CrawlRequest, CrawSession } from '../../shared/interfaces/crawler.interface';
+import { CrawlRequest, CrawSession } from '../../../types';
 
 // Mock playwright before any imports that might use it
 vi.mock('playwright', () => ({

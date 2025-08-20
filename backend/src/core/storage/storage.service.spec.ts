@@ -2,7 +2,7 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import { StorageService } from './storage.service';
 import * as Minio from 'minio';
-import { PageData } from '../../shared/interfaces/crawler.interface';
+import { PageData } from '../../types';
 
 // Mock MinIO
 vi.mock('minio', () => ({

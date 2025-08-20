@@ -6,7 +6,7 @@ import {
   CrawlRequest,
   CrawlResponse,
   CrawSession,
-} from "../shared/interfaces/crawler.interface";
+} from '../../../types';
 
 describe("CrawlerController", () => {
   let controller: CrawlerController;
