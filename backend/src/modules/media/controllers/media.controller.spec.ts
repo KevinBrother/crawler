@@ -1,10 +1,10 @@
 import { describe, it, expect, beforeEach, vi, Mocked } from "vitest";
 import { MediaController } from "./media.controller";
 import { StorageService } from "../../../core/storage/storage.service";
-import { MediaStorageService } from "../services/media/media-storage.service";
 import {
   MediaFileInfo,
 } from '../../../types';
+import { MediaStorageService } from "../services/media-storage.service";
 
 describe("MediaController", () => {
   let controller: MediaController;
@@ -49,6 +49,11 @@ describe("MediaController", () => {
           fileName: "test.jpg",
           url: "https://example.com/test.jpg",
           sourceUrl: "https://example.com",
+          originalUrl: "https://example.com/test.jpg",
+          fileSize: 1024,
+          downloadTime: new Date().toISOString(),
+          sessionId,
+          mimeType: "image/jpeg",
           type: "image",
           extension: "jpg",
           size: 1024,

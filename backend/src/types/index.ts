@@ -1,9 +1,8 @@
-// 统一导出所有类型定义
+// 导出所有类型定义
+// 从各模块导出 API 类型
+export * from '../modules/crawler/interfaces/api';
+export * from '../modules/media/interfaces/api';
+export * from '../modules/file/interfaces/api';
 
-// API 相关类型
-export * from './api/crawler';
-export * from './api/media';
-export * from './api/file';
-
-// 通用类型
+// 导出通用类型
 export * from './common';

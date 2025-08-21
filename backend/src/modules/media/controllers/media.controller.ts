@@ -16,7 +16,8 @@ import {
 } from '@nestjs/swagger';
 import { StorageService } from '../../../core/storage/storage.service';
 import { MediaStorageService } from '../services/media-storage.service';
-import { MediaFileInfo, ApiResponse } from '../../crawler/interfaces/crawler.interface';
+import { MediaFileInfo } from '../interfaces/api';
+import { ApiResponse } from '../../../types/common/response';
 
 @ApiTags('media')
 @Controller('api/media')

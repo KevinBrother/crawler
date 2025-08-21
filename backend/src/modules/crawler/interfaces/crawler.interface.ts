@@ -1,15 +1,8 @@
-// 导入共享的API类型定义
-export * from '../../../types';
+// 导入本模块的API类型定义
+export * from './api';
 
-// 重新导出类型，使用统一名称
+// 导入其他模块的类型定义
 export type {
-  PageData,
-  MediaTypeConfig,
-  MediaCrawlOptions,
-  CrawlRequest,
-  CrawlResponse,
-  CrawSession,
-  LinkInfo,
   MediaFileInfo,
   MediaDownloadResult
-} from '../../../types';
+} from '../../media/interfaces/api';

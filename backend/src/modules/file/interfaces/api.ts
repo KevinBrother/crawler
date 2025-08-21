@@ -1,4 +1,4 @@
-// 文件相关的API类型定义
+// 文件模块的API类型定义
 
 export interface FileDownloadResponse {
   downloadUrl: string;

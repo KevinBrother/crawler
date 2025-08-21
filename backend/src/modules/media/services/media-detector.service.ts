@@ -1,6 +1,9 @@
-import { Injectable, Logger } from '@nestjs/common';
-import { Page } from 'playwright';
-import { MediaTypeConfig, MediaFileInfo } from '../../crawler/interfaces/crawler.interface';
+import { Injectable, Logger } from "@nestjs/common";
+import { Page } from "playwright";
+import type {
+  MediaTypeConfig,
+  MediaFileInfo,
+} from "../../crawler/interfaces/crawler.interface";
 
 @Injectable()
 export class MediaDetectorService {
@@ -8,11 +11,11 @@ export class MediaDetectorService {
 
   // 预设的文件扩展名
   private readonly DEFAULT_EXTENSIONS = {
-    image: ['jpg', 'jpeg', 'png', 'gif', 'webp', 'svg', 'bmp', 'ico'],
-    video: ['mp4', 'avi', 'mov', 'wmv', 'flv', 'webm', 'mkv', 'm4v'],
-    audio: ['mp3', 'wav', 'flac', 'aac', 'ogg', 'wma', 'm4a'],
-    document: ['pdf', 'doc', 'docx', 'xls', 'xlsx', 'ppt', 'pptx', 'txt'],
-    archive: ['zip', 'rar', '7z', 'tar', 'gz', 'bz2', 'xz']
+    image: ["jpg", "jpeg", "png", "gif", "webp", "svg", "bmp", "ico"],
+    video: ["mp4", "avi", "mov", "wmv", "flv", "webm", "mkv", "m4v"],
+    audio: ["mp3", "wav", "flac", "aac", "ogg", "wma", "m4a"],
+    document: ["pdf", "doc", "docx", "xls", "xlsx", "ppt", "pptx", "txt"],
+    archive: ["zip", "rar", "7z", "tar", "gz", "bz2", "xz"],
   };
 
   /**
@@ -24,19 +27,25 @@ export class MediaDetectorService {
     mediaTypes: MediaTypeConfig[]
   ): Promise<MediaFileInfo[]> {
     const mediaFiles: MediaFileInfo[] = [];
-    
+
     try {
       // 获取所有可能的媒体元素
       const mediaElements = await this.extractMediaElements(page);
-      
+
       for (const element of mediaElements) {
-        const mediaFile = this.processMediaElement(element, sourceUrl, mediaTypes);
+        const mediaFile = this.processMediaElement(
+          element,
+          sourceUrl,
+          mediaTypes
+        );
         if (mediaFile) {
           mediaFiles.push(mediaFile);
         }
       }
-      
-      this.logger.log(`在页面 ${sourceUrl} 中检测到 ${mediaFiles.length} 个媒体文件`);
+
+      this.logger.log(
+        `在页面 ${sourceUrl} 中检测到 ${mediaFiles.length} 个媒体文件`
+      );
       return mediaFiles;
     } catch (error) {
       this.logger.error(`检测媒体文件失败: ${error.message}`);
@@ -50,87 +59,87 @@ export class MediaDetectorService {
   private async extractMediaElements(page: Page): Promise<any[]> {
     return await page.evaluate(() => {
       const elements = [];
-      
+
       // 图片元素
-      const images = document.querySelectorAll('img[src]');
-      images.forEach(img => {
+      const images = document.querySelectorAll("img[src]");
+      images.forEach((img) => {
         const imgElement = img as HTMLImageElement;
         elements.push({
-          type: 'image',
+          type: "image",
           url: imgElement.src,
-          alt: imgElement.alt || '',
-          tagName: 'img'
+          alt: imgElement.alt || "",
+          tagName: "img",
         });
       });
-      
+
       // 视频元素
-      const videos = document.querySelectorAll('video[src]');
-      videos.forEach(video => {
+      const videos = document.querySelectorAll("video[src]");
+      videos.forEach((video) => {
         const videoElement = video as HTMLVideoElement;
         if (videoElement.src) {
           elements.push({
-            type: 'video',
+            type: "video",
             url: videoElement.src,
-            tagName: 'video'
+            tagName: "video",
           });
         }
       });
-      
+
       // 视频source元素
-      const videoSources = document.querySelectorAll('video source[src]');
-      videoSources.forEach(source => {
+      const videoSources = document.querySelectorAll("video source[src]");
+      videoSources.forEach((source) => {
         const sourceElement = source as HTMLSourceElement;
         if (sourceElement.src) {
           elements.push({
-            type: 'video',
+            type: "video",
             url: sourceElement.src,
-            tagName: 'source'
+            tagName: "source",
           });
         }
       });
-      
+
       // 音频元素
-      const audios = document.querySelectorAll('audio[src]');
-      audios.forEach(audio => {
+      const audios = document.querySelectorAll("audio[src]");
+      audios.forEach((audio) => {
         const audioElement = audio as HTMLAudioElement;
         if (audioElement.src) {
           elements.push({
-            type: 'audio',
+            type: "audio",
             url: audioElement.src,
-            tagName: 'audio'
+            tagName: "audio",
           });
         }
       });
-      
+
       // 音频source元素
-      const audioSources = document.querySelectorAll('audio source[src]');
-      audioSources.forEach(source => {
+      const audioSources = document.querySelectorAll("audio source[src]");
+      audioSources.forEach((source) => {
         const sourceElement = source as HTMLSourceElement;
         if (sourceElement.src) {
           elements.push({
-            type: 'audio',
+            type: "audio",
             url: sourceElement.src,
-            tagName: 'source'
+            tagName: "source",
           });
         }
       });
-      
+
       // 链接元素（可能指向文档或压缩包）
-      const links = document.querySelectorAll('a[href]');
-      links.forEach(link => {
+      const links = document.querySelectorAll("a[href]");
+      links.forEach((link) => {
         const linkElement = link as HTMLAnchorElement;
         const href = linkElement.href;
-        const text = linkElement.textContent?.trim() || '';
+        const text = linkElement.textContent?.trim() || "";
         if (href && href !== window.location.href) {
           elements.push({
-            type: 'link',
+            type: "link",
             url: href,
             text: text,
-            tagName: 'a'
+            tagName: "a",
           });
         }
       });
-      
+
       return elements;
     });
   }
@@ -146,19 +155,23 @@ export class MediaDetectorService {
     try {
       const url = this.resolveUrl(element.url, sourceUrl);
       const extension = this.extractExtension(url);
-      
+
       if (!extension) {
         return null;
       }
-      
-      const mediaType = this.determineMediaType(extension, element.type, mediaTypes);
-      
+
+      const mediaType = this.determineMediaType(
+        extension,
+        element.type,
+        mediaTypes
+      );
+
       if (!mediaType) {
         return null;
       }
-      
+
       const fileName = this.generateFileName(url, extension);
-      
+
       return {
         url,
         originalUrl: url,
@@ -168,13 +181,13 @@ export class MediaDetectorService {
         sourceUrl,
         fileSize: 0, // 将在下载时更新
         downloadTime: new Date().toISOString(),
-        sessionId: '', // 将在调用时设置
-        mimeType: '', // 将在下载时确定
+        sessionId: "", // 将在调用时设置
+        mimeType: "", // 将在下载时确定
         metadata: {
           tagName: element.tagName,
           alt: element.alt,
-          text: element.text
-        }
+          text: element.text,
+        },
       };
     } catch (error) {
       this.logger.warn(`处理媒体元素失败: ${error.message}`);
@@ -214,15 +227,15 @@ export class MediaDetectorService {
     extension: string,
     elementType: string,
     mediaTypes: MediaTypeConfig[]
-  ): 'image' | 'video' | 'audio' | 'document' | 'archive' | null {
+  ): "image" | "video" | "audio" | "document" | "archive" | null {
     for (const config of mediaTypes) {
       const allowedExtensions = this.getAllowedExtensions(config);
-      
+
       if (allowedExtensions.includes(extension)) {
         return config.type;
       }
     }
-    
+
     return null;
   }
 
@@ -232,8 +245,8 @@ export class MediaDetectorService {
   private getAllowedExtensions(config: MediaTypeConfig): string[] {
     const defaultExtensions = this.DEFAULT_EXTENSIONS[config.type] || [];
     const customExtensions = config.extensions || [];
-    
-    if (config.mode === 'override') {
+
+    if (config.mode === "override") {
       return customExtensions;
     } else {
       // inherit mode
@@ -248,13 +261,13 @@ export class MediaDetectorService {
     try {
       const urlObj = new URL(url);
       const pathname = urlObj.pathname;
-      const fileName = pathname.split('/').pop() || 'unknown';
-      
+      const fileName = pathname.split("/").pop() || "unknown";
+
       // 如果文件名没有扩展名，添加扩展名
-      if (!fileName.includes('.')) {
+      if (!fileName.includes(".")) {
         return `${fileName}.${extension}`;
       }
-      
+
       return fileName;
     } catch {
       return `unknown.${extension}`;

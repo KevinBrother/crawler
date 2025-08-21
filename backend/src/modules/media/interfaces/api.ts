@@ -1,4 +1,4 @@
-// 媒体相关的API类型定义
+// 媒体模块的API类型定义
 
 export interface MediaFileInfo {
   url: string;

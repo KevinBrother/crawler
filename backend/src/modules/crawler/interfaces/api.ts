@@ -1,4 +1,4 @@
-// 爬虫相关的API类型定义
+// 爬虫模块的API类型定义
 
 // 爬虫相关类型 - 统一的爬取请求接口
 export interface CrawlRequest {
@@ -53,7 +53,7 @@ export interface CrawSession {
   pagesProcessed: number;
   totalPages: number;
   errors: string[];
-  // 冗余字段，方便前端显示
+  // 冗余字段，用于快速访问
   startUrl: string; // 等同于 config.url
   maxDepth: number; // 等同于 config.options.maxDepth
   maxPages: number; // 等同于 config.options.maxPages
@@ -80,7 +80,7 @@ export interface MediaCrawlOptions {
   concurrent?: number;
 }
 
-// 页面数据接口
+// 页面数据
 export interface PageData {
   url: string;
   title?: string;
@@ -95,7 +95,7 @@ export interface PageData {
   };
 }
 
-// 链接信息接口
+// 链接信息
 export interface LinkInfo {
   url: string;
   depth: number;
