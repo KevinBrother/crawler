@@ -14,7 +14,8 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "test:cov": "vitest run --coverage",
-    "test:ui": "vitest --ui"
+    "test:ui": "vitest --ui",
+    "preinstall": "npx only-allow pnpm"
   },
   "dependencies": {
     "@nestjs/axios": "^4.0.1",
