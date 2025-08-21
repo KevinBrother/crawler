@@ -1,12 +1,12 @@
 import { describe, it, expect, beforeEach, vi, Mocked } from "vitest";
 import { BadRequestException } from "@nestjs/common";
 import { CrawlerController } from "./crawler.controller";
-import { WebsiteCrawlerService } from "../services/crawler/website-crawler.service";
 import {
   CrawlRequest,
   CrawlResponse,
   CrawSession,
 } from '../../../types';
+import { WebsiteCrawlerService } from "../services/website-crawler.service";
 
 describe("CrawlerController", () => {
   let controller: CrawlerController;
